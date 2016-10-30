@@ -1,0 +1,15 @@
+define({
+  "name": "lumen-api-demo",
+  "version": "0.1.0",
+  "description": "LUMEN API DEMO",
+  "title": "lumen api demo",
+  "url": "http://jwt.cc/api",
+  "sampleUrl": false,
+  "apidoc": "0.2.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2016-10-25T15:40:44.236Z",
+    "url": "http://apidocjs.com",
+    "version": "0.16.1"
+  }
+});
