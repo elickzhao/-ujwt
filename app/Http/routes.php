@@ -45,7 +45,7 @@ $api->version('v1', [
     ]);
 
     //goods
-    $api->get('goods/{cid?}',[
+    $api->get('goods/{cid?}/{pageSize?}',[
         'as' => 'goods.list',
         'uses'=> 'CategoryController@goods'
     ]);

@@ -66,7 +66,7 @@ class CategoryController extends BaseController
         //return response()->json($a);
     }
 
-    public function goods($cid = 0)
+    public function goods($cid = 0,$pageSize=8)
     {
         $allCat = Cache::remember('allCat', Carbon::now()->addHour(2), function () {
             return Category::where('is_show', 1)->select('cat_id', 'cat_name', 'parent_id')->orderBy('sort_order')->get()->toArray();
@@ -76,8 +76,8 @@ class CategoryController extends BaseController
             return $this->getSubCat($allCat,$cid);
         });
 
-        $goods = Goods::whereIn('cat_id',$subCat)->select('goods_id','goods_name','market_price','shop_price','goods_thumb')->get();
-        return $this->response->collection($goods, new GoodsTransformer());
+        $goods = Goods::whereIn('cat_id',$subCat)->select('goods_id','goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize);
+        return $this->response->paginator($goods, new GoodsTransformer());
 
     }
 
