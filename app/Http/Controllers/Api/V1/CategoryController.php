@@ -11,6 +11,7 @@ use ApiDemo\Repositories\Contracts\UserRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends BaseController
 {
@@ -52,7 +53,7 @@ class CategoryController extends BaseController
      */
     public function index($cid = 0)
     {
-        $cat = Cache::remember('cat' . $cid, Carbon::now()->addMinutes(60), function () use ($cid) {
+        $cat = Cache::remember('cat-' . $cid, Carbon::now()->addMinutes(60), function () use ($cid) {
             return Category::where([['parent_id', $cid], ['is_show', 1]])->select('cat_id', 'cat_name', 'parent_id', 'style')->orderBy('sort_order')->get();
         });
         // 因为第一个元素返回的是对象,所以无法用集合的方法,所以还得转换一次
@@ -66,17 +67,30 @@ class CategoryController extends BaseController
         //return response()->json($a);
     }
 
-    public function goods($cid = 0,$pageSize=8)
+    public function goods($cid = 0,$pageSize=8,Request $request)
     {
-        $allCat = Cache::remember('allCat', Carbon::now()->addHour(2), function () {
+
+        //XXX 栏目分类 不总会变 按道理应长时间缓存 当改变时再更新, 现在先这样处理 因为没有后台
+        $allCat = Cache::remember('allCat', Carbon::now()->addHour(3), function () {
             return Category::where('is_show', 1)->select('cat_id', 'cat_name', 'parent_id')->orderBy('sort_order')->get()->toArray();
         });
-
-        $subCat = Cache::remember('subCat'.$cid, Carbon::now()->addHour(1), function () use($allCat,$cid) {
+        // 子分类也是同样的道理
+        $subCat = Cache::remember('subCat'.$cid, Carbon::now()->addHour(2), function () use($allCat,$cid) {
             return $this->getSubCat($allCat,$cid);
         });
 
-        $goods = Goods::whereIn('cat_id',$subCat)->select('goods_id','goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize);
+
+
+        //$goods =  Goods::whereIn('cat_id',$subCat)->select('goods_id','goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize);
+        // 两个差不多,DB稍微快一丢丢
+        //$goods = DB::connection('b2c')->table('ecs_goods')->whereIn('cat_id',$subCat)->select('goods_id','goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize);
+
+        $page = $request->input('page',1);
+
+        $goods = Cache::remember('goods-'.$cid.'-'.$page, Carbon::now()->addHour(1), function () use($subCat,$pageSize) {
+            return Goods::whereIn('cat_id',$subCat)->select('goods_id','goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize);
+        });
+
         return $this->response->paginator($goods, new GoodsTransformer());
 
     }
