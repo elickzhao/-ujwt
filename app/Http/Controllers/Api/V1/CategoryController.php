@@ -95,6 +95,23 @@ class CategoryController extends BaseController
 
     }
 
+    public function getGood($id){
+        //这里可以用 Transformer 的 include 方法直接返回带 img 的数据, 而且那样不用多写一个路由, 可是问题是那样不知道如何缓存,请求会很慢
+        $good = Cache::remember('good-'.$id, Carbon::now()->addHour(1), function () use($id) {
+            //XXX 这里可以把列表时的缓存数据拿出来 那样可能更快一些
+            $gc = Goods::select('goods_id','goods_name','market_price','shop_price','goods_thumb')->findOrFail($id);
+            $gc['imgs'] = Goods::find($id)->images()->select('thumb_url')->get()->pluck('thumb_url')->all();
+            $shop_name = Goods::find($id)->merchants->shoprz_brandName;
+            $shop_name .= Goods::find($id)->merchants->shopNameSuffix;
+            $gc['shop_name'] =$shop_name;
+            $gc['logo_thumb'] = Goods::find($id)->shop->logo_thumb;
+
+            return $gc;
+        });
+        return $this->response->item($good,new GoodsTransformer());
+    }
+
+
     /**
      * 获取所有子栏目
      * @param $allCat

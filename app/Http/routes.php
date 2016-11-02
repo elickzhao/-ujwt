@@ -49,6 +49,12 @@ $api->version('v1', [
         'as' => 'goods.list',
         'uses'=> 'CategoryController@goods'
     ]);
+
+    //good
+    $api->get('good/{id}',[
+        'as' => 'good.index',
+        'uses'=> 'CategoryController@getGood'
+    ]);
     // User
     // user list
     $api->get('users', [
