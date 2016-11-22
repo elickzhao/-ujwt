@@ -98,10 +98,10 @@ $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\RepositoryServiceProvider::class);
 // dingo/api
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
-//jwt
+//jwt   //这里是注册guards > api > driver 下面那个并不是 有点晕.  在 AbstractServiceProvider 73行
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 // email 或者放在 provider里面
-//$app->register(Illuminate\Mail\MailServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 
 app('Dingo\Api\Auth\Auth')->extend('jwt', function ($app) {
     return new Dingo\Api\Auth\Provider\JWT($app['Tymon\JWTAuth\JWTAuth']);
@@ -112,6 +112,11 @@ $app->singleton(Illuminate\Auth\AuthManager::class, function ($app) {
     return $app->make('auth');
 });
 
+
+//XXX 不抱错 不好使 也是醉啊
+$app->register(Barryvdh\Debugbar\LumenServiceProvider::class);
+
+$app->configure('debugbar');
 
 // 设置 transformer 的 serializer
 //$app['Dingo\Api\Transformer\Factory']->setAdapter(function ($app) {

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class AuthController extends BaseController
 {
     protected $userRepository;
+    //protected $username = 'user_name';
 
     public function __construct(UserRepositoryContract $userRepository)
     {
@@ -36,8 +37,9 @@ class AuthController extends BaseController
      */
     public function login(Request $request)
     {
+        //XXX 这里的登录数据库需要修改
         $validator = \Validator::make($request->all(), [
-            'email' => 'required|email',
+            'user_name' => 'required',
             'password' => 'required',
         ]);
 
@@ -45,13 +47,11 @@ class AuthController extends BaseController
             return $this->errorBadRequest($validator->messages());
         }
 
-        $credentials = $request->only('email', 'password');
-
+        $credentials = $request->only('user_name', 'password');
         // 验证失败返回403
         if (! $token = \Auth::attempt($credentials)) {
             $this->response->errorForbidden(trans('auth.incorrect'));
         }
-
         return $this->response->array(compact('token'));
     }
 
