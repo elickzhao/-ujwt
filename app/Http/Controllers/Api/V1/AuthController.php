@@ -52,7 +52,10 @@ class AuthController extends BaseController
         if (! $token = \Auth::attempt($credentials)) {
             $this->response->errorForbidden(trans('auth.incorrect'));
         }
-        return $this->response->array(compact('token'));
+        $user = $request->user()->toArray();
+        $user = array_only($user, ['user_id','email','user_name','user_money','frozen_money','pay_points','rank_points','address_id','mobile_phone','user_picture']);
+        $user = array_add($user, 'token', $token);
+        return $this->response->array($user);
     }
 
     /**
