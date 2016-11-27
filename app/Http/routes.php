@@ -94,7 +94,9 @@ $api->version('v1', [
     ]);
 
     // need authentication
-    // 这里用的中间件 并不是app.php里注册的那个,而是api里的middleware. 如果用app.php那个会无法验证过期的.
+    // 这里用的中间件 并不是app.php里注册的那个 'auth' => App\Http\Middleware\Authenticate::class,
+    // 而是dinggo的api里的middleware就是Auth. 如果用app.php那个会无法验证过期的.
+    // 这个注册和jwt一样 都是在 LumenServiceProvider 里完成的 所以不注意会找不到
     $api->group(['middleware' => 'api.auth'], function ($api) {
         // USER
         // my detail
@@ -112,6 +114,11 @@ $api->version('v1', [
         $api->put('user/password', [
             'as' => 'user.password.update',
             'uses' => 'UserController@editPassword',
+        ]);
+
+        $api->post('user/wallet/{id}',[
+            'as' => 'user.wallet',
+            'uses' => 'UserController@getWallet',
         ]);
 
         // POST

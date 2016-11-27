@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use ApiDemo\Transformers\UserTransformer;
 use ApiDemo\Repositories\Contracts\UserRepositoryContract;
 use Illuminate\Http\Request;
+use ApiDemo\Models\ECUser;
 
 class UserController extends BaseController
 {
@@ -226,5 +227,17 @@ class UserController extends BaseController
         $token = $this->auth->fromUser($user);
 
         return $this->response->array(compact('token'));
+    }
+
+    public function getWallet($id){
+        $wallet = ECUser::where('user_id',$id)->select('user_money','pay_points')->first()->toArray();
+
+        //其实这两种写法都可以 用Transformer()更简洁和灵活一些,直接用array开发是更快一些,因为不用去建立文件.
+        //其实看 ECUserTransformer() 的方法 就知道是一样的 $ECUser->attributesToArray(); 就是把属性转换成array 和上面toArray()一样
+        //return $this->response->collection($wallet, new ECUserTransformer());
+        return $this->response->array($wallet);
+        //上面那个用的是dingo的response和下面这个不一样,下面的是laravel的
+        //这两个是有区别的 dingo的只有array()没有json, laravel的正好相反,有json()没有array() 但他们的结果是一样的
+        //return response()->json($wallet);
     }
 }
