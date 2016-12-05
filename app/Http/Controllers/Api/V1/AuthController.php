@@ -48,7 +48,7 @@ class AuthController extends BaseController
         }
 
         $credentials = $request->only('user_name', 'password');
-        // 验证失败返回403
+        // 验证失败返回403    //疯了怎么突然好使,又突然不好使啊  //找到原因了 就因为一个空格
         if (! $token = \Auth::attempt($credentials)) {
             $this->response->errorForbidden(trans('auth.incorrect'));
         }

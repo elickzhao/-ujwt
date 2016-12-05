@@ -28,7 +28,7 @@ $api->version('v1', [
 
     // Auth
     // login
-    $api->post('authorization', [
+    $api->get('authorization', [
         'as' => 'auth.login',
         'uses' => 'AuthController@login',
     ]);
@@ -97,7 +97,9 @@ $api->version('v1', [
     // 这里用的中间件 并不是app.php里注册的那个 'auth' => App\Http\Middleware\Authenticate::class,
     // 而是dinggo的api里的middleware就是Auth. 如果用app.php那个会无法验证过期的.
     // 这个注册和jwt一样 都是在 LumenServiceProvider 里完成的 所以不注意会找不到
-    $api->group(['middleware' => 'api.auth'], function ($api) {
+    // 这个刷新中间件 直接登录token就可以用了 自动刷新,但怎么把新的token存储一下呢
+    // 看来这个也没什么用 自动更新一次这个token就作废了 还没发收到新的token 还是在app上验证吧
+    $api->group(['middleware' => 'api.auth','middleware' => 'jwt.renew'], function ($api) {
         // USER
         // my detail
         $api->get('user', [
