@@ -31,4 +31,8 @@ class ECUser extends BaseModel implements AuthenticatableContract, JWTSubject
     {
         return [];
     }
+
+    public function collects(){
+        return $this->belongsToMany('ApiDemo\Models\Goods','ecs_collect_goods','user_id','goods_id');
+    }
 }

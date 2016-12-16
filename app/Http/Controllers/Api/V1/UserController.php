@@ -6,6 +6,8 @@ use ApiDemo\Transformers\UserTransformer;
 use ApiDemo\Repositories\Contracts\UserRepositoryContract;
 use Illuminate\Http\Request;
 use ApiDemo\Models\ECUser;
+use Cache;
+use Carbon\Carbon;
 
 class UserController extends BaseController
 {
@@ -239,5 +241,20 @@ class UserController extends BaseController
         //上面那个用的是dingo的response和下面这个不一样,下面的是laravel的
         //这两个是有区别的 dingo的只有array()没有json, laravel的正好相反,有json()没有array() 但他们的结果是一样的
         //return response()->json($wallet);
+    }
+
+    public function getCollect($id,$pageSize=8,Request $request){
+
+        $page = $request->input('page',1);
+
+        $collects = Cache::remember('collects-'.$id.'-'.$page, Carbon::now()->addHour(1), function () use($id,$pageSize) {
+            //用了分页,这个select就不好使了.当然这是多对多模型,在不是多对多的模型时分页时select也是可以的
+            return  ECUser::find($id)->collects()->select('goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize)->toArray();
+        });
+
+        //这个是存在的不过不知道为什么这个这么慢,也许用redis能快一些?
+        //$r = Cache::get('collects-'.$id.'-'.$page);
+        //$collects = ECUser::find($id)->collects()->select('goods_name','market_price','shop_price','goods_thumb')->get()->toArray();
+        return $this->response->array($collects);
     }
 }
