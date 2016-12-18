@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use ApiDemo\Transformers\UserTransformer;
+use ApiDemo\Transformers\GoodsTransformer;
 use ApiDemo\Repositories\Contracts\UserRepositoryContract;
 use Illuminate\Http\Request;
 use ApiDemo\Models\ECUser;
@@ -249,12 +250,13 @@ class UserController extends BaseController
 
         $collects = Cache::remember('collects-'.$id.'-'.$page, Carbon::now()->addHour(1), function () use($id,$pageSize) {
             //用了分页,这个select就不好使了.当然这是多对多模型,在不是多对多的模型时分页时select也是可以的
-            return  ECUser::find($id)->collects()->select('goods_name','market_price','shop_price','goods_thumb')->paginate($pageSize)->toArray();
+            return $collects = ECUser::find($id)->collects()->paginate($pageSize);
         });
 
         //这个是存在的不过不知道为什么这个这么慢,也许用redis能快一些?
         //$r = Cache::get('collects-'.$id.'-'.$page);
         //$collects = ECUser::find($id)->collects()->select('goods_name','market_price','shop_price','goods_thumb')->get()->toArray();
-        return $this->response->array($collects);
+        //return $this->response->array($collects);
+        return $this->response->paginator($collects,new GoodsTransformer());
     }
 }
