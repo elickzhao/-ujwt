@@ -128,7 +128,7 @@ $api->version('v1', [
             'uses' => 'UserController@getCollect',
         ]);
 
-        $api->get('user/collect/delete/{id}/{goodId}',[
+        $api->post('user/collect/delete/{id}/{goodId}',[
             'middleware' => 'cache.del:collects',
             'as' => 'user.collect.delete',
             'uses' => 'UserController@delCollect',
