@@ -116,14 +116,22 @@ $api->version('v1', [
             'uses' => 'UserController@editPassword',
         ]);
 
+        //我的钱包
         $api->post('user/wallet/{id}',[
             'as' => 'user.wallet',
             'uses' => 'UserController@getWallet',
         ]);
 
+        //我的收藏
         $api->post('user/collect/{id}/{pageSize?}',[
             'as' => 'user.collect',
             'uses' => 'UserController@getCollect',
+        ]);
+
+        $api->get('user/collect/delete/{id}/{goodId}',[
+            'middleware' => 'cache.del:collects',
+            'as' => 'user.collect.delete',
+            'uses' => 'UserController@delCollect',
         ]);
 
         // POST

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use ApiDemo\Models\ECUser;
 use Cache;
 use Carbon\Carbon;
+use ApiDemo\Models\GoodCollects;
 
 class UserController extends BaseController
 {
@@ -254,9 +255,16 @@ class UserController extends BaseController
         });
 
         //这个是存在的不过不知道为什么这个这么慢,也许用redis能快一些?
-        //$r = Cache::get('collects-'.$id.'-'.$page);
-        //$collects = ECUser::find($id)->collects()->select('goods_name','market_price','shop_price','goods_thumb')->get()->toArray();
-        //return $this->response->array($collects);
         return $this->response->paginator($collects,new GoodsTransformer());
+    }
+
+    public function delCollect($id,$goodId){
+        $r = GoodCollects::where(['user_id'=>$id,'goods_id'=>$goodId])->delete();
+        return response()->json($r);
+    }
+
+    //XXX 这里注意啊增加的时候不能重复哦
+    public function addCollect(){
+
     }
 }

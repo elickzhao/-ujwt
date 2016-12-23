@@ -76,6 +76,7 @@ $app->middleware([
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'cors' => App\Http\Middleware\Cors::class,
+    'cache.del' => App\Http\Middleware\DelCache::class,
 ]);
 
 /*

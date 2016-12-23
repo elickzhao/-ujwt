@@ -15,7 +15,7 @@ class GoodsTransformer extends TransformerAbstract
             'goods_name' => $goods->goods_name,
             'market_price'    => $goods->market_price,
             'shop_price' =>  $goods->shop_price,
-              'goods_thumb' => $goods->shop_price
+            'goods_thumb' => $goods->goods_thumb
         ];
     }
 
